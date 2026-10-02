@@ -65,7 +65,7 @@ function setupInteractive() {
   transitionToState(VisualizationStates.NONE);
 }
 
-function setMCTS(mcts_obj, trace) {
+function setMCTS(mcts_obj, trace, searchTimeMs=0) {
   initial_board = mcts_obj.model.copy();
   action_trace = trace.trace;
   best_move = trace.move;
@@ -75,6 +75,13 @@ function setMCTS(mcts_obj, trace) {
   draw_tree = makeDrawTree(reconstructed_tree);
 
   tree_vis_p5.initial_board = initial_board;
+
+  // Ghi nhận thông tin tìm kiếm MCTS vào module Diagnostics
+  if (typeof recordMCTSSearch === "function") {
+    let rollouts = action_trace.length > 0 ? (action_trace.length - 1) : 0;
+    let playerMark = (best_move && best_move.player === PLAYER.HUMAN) ? "h" : "m";
+    recordMCTSSearch(searchTimeMs, rollouts, final_tree.nodes.length, playerMark);
+  }
 
   let action = action_trace[0][0];
   applyAction(action);
@@ -96,16 +103,235 @@ function updateInterface() {
   let action_progress_bar = "(-/-)";
   let iteration_progress_bar = "(-/-)";
 
-  if (current_vis_state != VisualizationStates.NONE) {
-    action_kind = action_trace[currentIterationIdx][currentActionIdx].kind;
+  if (current_vis_state != VisualizationStates.NONE && action_trace.length > 0) {
+    let currentAction = action_trace[currentIterationIdx][currentActionIdx];
+    action_kind = currentAction.kind;
     action_progress_bar = "(" + totalActionsTillNow + "/" + (action_trace.flat().length - 1) + ")";
     iteration_progress_bar = "(" + currentIterationIdx + "/" + (action_trace.length - 1) + ")";
+    
+    updateLiveSidebar(currentAction);
+  } else {
+    resetLiveSidebar();
   }
 
   document.getElementById("current_action_kind").innerHTML = action_kind;
-  document.getElementById("current_action_kind").className = action_kind;
+  document.getElementById("current_action_kind").className = "badge " + action_kind;
   document.getElementById("current_action_count").innerHTML = action_progress_bar;
   document.getElementById("current_iteration_count").innerHTML = iteration_progress_bar;
+}
+
+function resetLiveSidebar() {
+  let badge = document.getElementById("sb_phase_badge");
+  let desc = document.getElementById("sb_phase_desc");
+  let formula = document.getElementById("sb_formula_sub");
+  let candidates = document.getElementById("sb_candidates_area");
+
+  if (badge) {
+    badge.className = "badge";
+    badge.innerText = "Chờ";
+  }
+  if (desc) {
+    desc.innerText = "Nhấn 'Chạy thuật toán MCTS' để bắt đầu mô phỏng từng bước.";
+  }
+  if (formula) {
+    formula.innerHTML = "UCB1 = --";
+  }
+  if (candidates) {
+    candidates.innerHTML = "Chưa có dữ liệu nhánh con.";
+  }
+}
+
+function updateLiveSidebar(action) {
+  let badge = document.getElementById("sb_phase_badge");
+  let desc = document.getElementById("sb_phase_desc");
+  let formula = document.getElementById("sb_formula_sub");
+  let candidates = document.getElementById("sb_candidates_area");
+
+  if (!badge || !desc || !formula) return;
+
+  badge.className = "badge " + action.kind;
+  badge.innerText = action.kind.toUpperCase();
+
+  let targetNode = reconstructed_tree ? reconstructed_tree.get(action.node_id) : null;
+  let targetParent = (targetNode && reconstructed_tree) ? reconstructed_tree.getParent(targetNode) : null;
+
+  switch (action.kind) {
+    case "selection":
+      desc.innerHTML = "Duyệt từ nút gốc xuống nút lá theo chỉ số <b>UCB1 lớn nhất</b>.";
+      if (targetNode && targetParent) {
+        showUCB1Formula(targetNode, targetParent, formula);
+        showCandidatesTable(targetParent, targetNode.id, candidates);
+      } else if (targetNode && targetNode.isRoot()) {
+        formula.innerHTML = `<b>Nút Gốc (Root):</b> N = ${targetNode.data.simulations}, V = ${targetNode.data.value}`;
+        showCandidatesTable(targetNode, null, candidates);
+      }
+      break;
+
+    case "expansion":
+      let pos = (final_tree && final_tree.get(action.node_id).data.move) ? final_tree.get(action.node_id).data.move.position : "?";
+      desc.innerHTML = `Mở rộng thêm nút con mới tại <b>ô số ${pos}</b> từ nút lá chưa xét hết.`;
+      formula.innerHTML = `
+        <div><b>Khởi tạo nút mới (Ô ${pos}):</b></div>
+        <div style="font-size: 11px; color: #475569; margin-top: 2px;">
+          • Giá trị (V) = 0<br>
+          • Lượt thăm (N) = 0<br>
+          • Điểm UCB1 = ∞ (Ưu tiên mô phỏng ít nhất 1 lần)
+        </div>
+      `;
+      if (targetParent) {
+        showCandidatesTable(targetParent, targetNode ? targetNode.id : null, candidates);
+      }
+      break;
+
+    case "simulation":
+      let res = action.new_data ? action.new_data.result : "";
+      let resText = (res === "m") ? "<span style='color: #dc2626; font-weight: bold;'>Máy (O) Thắng</span>" : 
+                    (res === "h" ? "<span style='color: #2563eb; font-weight: bold;'>Người (X) Thắng</span>" : "<b>Hòa (Draw)</b>");
+      let deltaScore = (res === "m") ? "+1 điểm" : (res === "h" ? "-1 điểm" : "0 điểm");
+      desc.innerHTML = `Thực hiện Rollout ngẫu nhiên cho đến kết thúc ván: ${resText}.`;
+      formula.innerHTML = `
+        <div><b>Kết quả Rollout:</b> ${resText}</div>
+        <div style="font-size: 11px; color: #475569; margin-top: 2px;">
+          • Điểm lan truyền: <b>${deltaScore}</b><br>
+          • Ván cờ mô phỏng kết thúc, chuẩn bị cập nhật ngược lên cây (Backpropagation).
+        </div>
+      `;
+      break;
+
+    case "backpropagation":
+      let oldV = action.old_data ? action.old_data.old_value : 0;
+      let newV = action.new_data ? action.new_data.new_value : 0;
+      let oldN = action.old_data ? action.old_data.old_visits : 0;
+      let newN = action.new_data ? action.new_data.new_visits : 0;
+      desc.innerHTML = `Lan truyền kết quả ngược lên gốc: Cập nhật <b>N: ${oldN} ➔ ${newN}</b>, <b>V: ${oldV} ➔ ${newV}</b>.`;
+      let winRate = (newN > 0) ? (newV / newN).toFixed(3) : "0.000";
+      formula.innerHTML = `
+        <div><b>Cập nhật nút:</b></div>
+        <div style="font-size: 11px; color: #475569; margin-top: 2px;">
+          • Lượt thăm mới (N): <b>${newN}</b> (+1)<br>
+          • Điểm tích lũy (V): <b>${newV}</b><br>
+          • Tỉ lệ thắng trung bình (V/N): <b>${winRate}</b>
+        </div>
+      `;
+      if (targetParent) {
+        showCandidatesTable(targetParent, targetNode ? targetNode.id : null, candidates);
+      }
+      break;
+
+    case "finish":
+      let bestMoveNode = reconstructed_tree ? reconstructed_tree.get(action.node_id) : null;
+      let bestPos = (bestMoveNode && bestMoveNode.data.move) ? bestMoveNode.data.move.position : "?";
+      desc.innerHTML = `<span style='color: #166534; font-weight: bold;'>HOÀN THÀNH TÌM KIẾM!</span> Chọn nước đi tối ưu tại <b>ô số ${bestPos}</b>.`;
+      formula.innerHTML = `
+        <div><b>Nước đi tối ưu: Ô ${bestPos}</b></div>
+        <div style="font-size: 11px; color: #166534; margin-top: 2px;">
+          Tiêu chuẩn chọn: <b>Max N (Lượt mô phỏng nhiều nhất)</b>.<br>
+          Số lượt duyệt lớn đảm bảo thuật toán đã hội tụ và giảm thiểu rủi ro ngẫu nhiên.
+        </div>
+      `;
+      if (reconstructed_tree) {
+        showCandidatesTable(reconstructed_tree.getRoot(), action.node_id, candidates);
+      }
+      break;
+  }
+}
+
+function showUCB1Formula(node, parent, container) {
+  let v = node.data.value;
+  let n = node.data.simulations;
+  let np = parent.data.simulations;
+  let pos = (node.data.move) ? node.data.move.position : "?";
+
+  if (n === 0) {
+    container.innerHTML = `<div><b>Ô ${pos}:</b> N = 0 ➔ UCB1 = ∞</div>`;
+    return;
+  }
+
+  let exploitation = v / n;
+  let logNp = Math.log(Math.max(np, 1));
+  let exploration = Math.sqrt((2 * logNp) / n);
+  let ucb1 = exploitation + exploration;
+
+  container.innerHTML = `
+    <div style="font-weight: 600; margin-bottom: 3px;">Đang xét ô [${pos}]:</div>
+    <div style="font-size: 11px; line-height: 1.4;">
+      • Khai thác (V/N) = ${v} / ${n} = <b>${exploitation.toFixed(3)}</b><br>
+      • Khám phá = √[2 * ln(${np}) / ${n}] = <b>${exploration.toFixed(3)}</b><br>
+      <div style="margin-top: 4px; padding-top: 4px; border-top: 1px dashed #7dd3fc; color: #0369a1; font-weight: bold;">
+        ➔ UCB1 = ${exploitation.toFixed(3)} + ${exploration.toFixed(3)} = ${ucb1.toFixed(3)}
+      </div>
+    </div>
+  `;
+}
+
+function showCandidatesTable(parentNode, highlightedChildId, container) {
+  if (!container || !parentNode || !reconstructed_tree) return;
+  let children = reconstructed_tree.getChildren(parentNode);
+  if (!children || children.length === 0) {
+    container.innerHTML = "<div style='color: #94a3b8; font-style: italic;'>Không có nút con.</div>";
+    return;
+  }
+
+  let html = `
+    <table class="formula-table">
+      <thead>
+        <tr>
+          <th>Ô</th>
+          <th>N</th>
+          <th>V</th>
+          <th>V/N</th>
+          <th>UCB1</th>
+        </tr>
+      </thead>
+      <tbody>
+  `;
+
+  for (let ch of children) {
+    let pos = (ch.data.move) ? ch.data.move.position : "?";
+    let n = ch.data.simulations;
+    let v = ch.data.value;
+    let vn = (n > 0) ? (v / n).toFixed(2) : "-";
+    let ucb = (n > 0) ? UCB1(ch, parentNode).toFixed(2) : "∞";
+    let isSelected = (ch.id === highlightedChildId);
+    let rowClass = isSelected ? "highlighted" : "";
+
+    html += `
+      <tr class="${rowClass}">
+        <td><b>${pos}</b></td>
+        <td>${n}</td>
+        <td>${v}</td>
+        <td>${vn}</td>
+        <td><b>${ucb}</b></td>
+      </tr>
+    `;
+  }
+
+  html += "</tbody></table>";
+  container.innerHTML = html;
+}
+
+function updateSidebarForHoveredNode(node) {
+  if (!node || !reconstructed_tree) return;
+  let formula = document.getElementById("sb_formula_sub");
+  let candidates = document.getElementById("sb_candidates_area");
+  
+  if (node.isRoot()) {
+    if (formula) formula.innerHTML = `<b>Nút Gốc (Root):</b> N = ${node.data.simulations}, V = ${node.data.value}`;
+    if (candidates) showCandidatesTable(node, null, candidates);
+  } else {
+    let parent = reconstructed_tree.getParent(node);
+    if (parent && formula) {
+      showUCB1Formula(node, parent, formula);
+    }
+    if (candidates) {
+      let children = reconstructed_tree.getChildren(node);
+      if (children.length > 0) {
+        showCandidatesTable(node, null, candidates);
+      } else if (parent) {
+        showCandidatesTable(parent, node.id, candidates);
+      }
+    }
+  }
 }
 
 function makeDrawTree(tree) {

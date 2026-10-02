@@ -39,6 +39,10 @@ const s = (sketch) => {
     mctsTimeoutSlider = sketch.select("#mcts_timeout_slider");
     mctsTimeoutSpan = sketch.select("#mcts_timeout_span");
 
+    if (typeof customBoardManager !== "undefined" && customBoardManager.init) {
+      customBoardManager.init();
+    }
+
     sketch.reset();
   };
 
@@ -53,6 +57,17 @@ const s = (sketch) => {
     TTT_BOARD = new TicTacToeBoard();
     whoseTurn = sketch.round(sketch.random(0, 1));
     sketch.stateTransition(GameStates.SELECT_STARTING_PLAYER);
+    if (typeof transitionToState === "function" && typeof VisualizationStates !== "undefined") {
+      transitionToState(VisualizationStates.NONE);
+    }
+    let diagArea = document.getElementById("sb_diagnostics_area");
+    if (diagArea) {
+      diagArea.innerHTML = `
+        • Thời gian tính: <b id="stat_time">-- ms</b><br>
+        • Số nút đã tạo: <b id="stat_nodes">--</b><br>
+        • Bao phủ không gian mẫu: <b id="stat_coverage">--%</b>
+      `;
+    }
   }
 
   sketch.drawBoard = () => {
@@ -120,6 +135,9 @@ const s = (sketch) => {
                     case "v": winner = "DRAW"; break;
                 }
                 gameOverWinner.html(winner);
+                if (typeof renderPostGameDiagnostics === "function") {
+                    renderPostGameDiagnostics(TTT_BOARD.checkWin(), TTT_BOARD);
+                }
                 break;
         }
 
@@ -152,9 +170,31 @@ const s = (sketch) => {
     }
 
     sketch.mouseClicked = () => {
-        if (hoveredTile != -1 && whoseTurn == PLAYER.HUMAN && TTT_BOARD.isLegalPosition(hoveredTile)) {
-            TTT_BOARD.humanMakeMove(hoveredTile);
-            sketch.endMove(PLAYER.HUMAN);
+        if (hoveredTile != -1) {
+            // Chế độ tự xếp thế cờ / Custom Board Mode
+            if (typeof customBoardManager !== "undefined" && customBoardManager.isCustomMode) {
+                let currentVal = TTT_BOARD.grid[hoveredTile];
+                if (currentVal === "") {
+                    TTT_BOARD.grid[hoveredTile] = (whoseTurn == PLAYER.HUMAN) ? "h" : "m";
+                    whoseTurn = (whoseTurn == PLAYER.HUMAN) ? PLAYER.MACHINE : PLAYER.HUMAN;
+                    sketch.selectStartingPlayer(whoseTurn);
+                } else if (currentVal === "h") {
+                    TTT_BOARD.grid[hoveredTile] = "m";
+                } else {
+                    TTT_BOARD.grid[hoveredTile] = "";
+                }
+                let win = TTT_BOARD.checkWin();
+                if (win !== "") {
+                    sketch.stateTransition(GameStates.GAME_OVER);
+                }
+                return;
+            }
+
+            // Chế độ chơi thông thường
+            if (whoseTurn == PLAYER.HUMAN && TTT_BOARD.isLegalPosition(hoveredTile)) {
+                TTT_BOARD.humanMakeMove(hoveredTile);
+                sketch.endMove(PLAYER.HUMAN);
+            }
         }
     }
 
@@ -164,15 +204,24 @@ const s = (sketch) => {
     }
 
     sketch.machineMctsMove = () => {
-        let monteCarlo = new MCTS(TTT_BOARD.copy(), PLAYER.MACHINE);
-        let MCTS_search = monteCarlo.runSearch(mctsTimeoutSlider.value());
-        setMCTS(monteCarlo, MCTS_search);
+        let startTime = performance.now();
+        let playerToMove = (whoseTurn !== undefined) ? whoseTurn : PLAYER.MACHINE;
+        let monteCarlo = new MCTS(TTT_BOARD.copy(), playerToMove);
+        let iterations = parseInt(mctsTimeoutSlider.value(), 10) || 100;
+        let MCTS_search = monteCarlo.runSearch(iterations);
+        let searchTime = Math.round(performance.now() - startTime);
+
+        setMCTS(monteCarlo, MCTS_search, searchTime);
         sketch.stateTransition(GameStates.RUNNING_VIS);
     }
 
     sketch.endMove = (player) => {
-        if (TTT_BOARD.checkWin() != "") {
+        let winStatus = TTT_BOARD.checkWin();
+        if (winStatus != "") {
             sketch.stateTransition(GameStates.GAME_OVER);
+            if (typeof renderPostGameDiagnostics === "function") {
+                renderPostGameDiagnostics(winStatus, TTT_BOARD);
+            }
         } else {
             sketch.stateTransition(player == PLAYER.HUMAN ? 
                 GameStates.WAITING_MACHINE_MOVE : 

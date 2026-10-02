@@ -14,11 +14,21 @@ const vis = (s) => {
 
   let node_distance = {x: 0.75, y: 0.75};
 
-  let node_size = {x: 50, y: 90};
+  let node_size = {x: 60, y: 105};
 
   s.setup = () => {
     s.textFont("Courier");
-    s.createCanvas(800, 500);
+    let container = document.getElementById("tree_vis");
+    let w = container && container.clientWidth > 0 ? container.clientWidth : 950;
+    let h = container && container.clientHeight > 0 ? container.clientHeight : 650;
+    s.createCanvas(w, h);
+  };
+
+  s.windowResized = () => {
+    let container = document.getElementById("tree_vis");
+    if (container && s.canvas && container.clientWidth > 0 && container.clientHeight > 0) {
+      s.resizeCanvas(container.clientWidth, container.clientHeight);
+    }
   };
 
   s.draw = () => {
@@ -282,6 +292,7 @@ const vis = (s) => {
   }
 
   s.handleHover = () => {
+    let prevHover = hovered_node_id;
     if (s.mouseX > 0 && s.mouseY > 0 && s.mouseX < s.width && s.mouseY < s.height && s.tree) {
       for (var i = 0; i < s.tree.nodes.length; i++) {
         let node = s.tree.nodes[i];
@@ -299,6 +310,10 @@ const vis = (s) => {
           hovered_node_pos = {
             x: s.mouseX - bounds.x_min,
             y: s.mouseY - bounds.y_min};
+
+          if (hovered_node_id !== prevHover && typeof updateSidebarForHoveredNode === "function") {
+            updateSidebarForHoveredNode(node);
+          }
           return;
         }
       }
@@ -306,6 +321,9 @@ const vis = (s) => {
 
     hovered_node_id = -1;
     hovered_node_pos = {x: 0, y: 0};
+    if (prevHover !== -1 && typeof updateInterface === "function") {
+      updateInterface();
+    }
   }
 };
 

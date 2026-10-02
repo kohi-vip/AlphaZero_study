@@ -7,82 +7,170 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.9.0/addons/p5.dom.min.js" integrity="sha256-2/3R3NV5zryj0fDjD3cDh+SNiWQ/TJiMVZzAo5FrhiU=" crossorigin="anonymous"></script>
         <script src="./draw_tree.js"></script>
         <script src="./lib/tree.js"></script>
-        <script src="./interactive.js"></script>
-        <script src="./tree_vis.js"></script>
         <script src="./lib/tictactoe.js"></script>
         <script src="./lib/mcts.js"></script>
+        <script src="./diagnostics.js"></script>
+        <script src="./custom_board.js"></script>
+        <script src="./interactive.js"></script>
+        <script src="./tree_vis.js"></script>
         <script src="./sketch.js"></script>
-        <!-- Place this tag in your head or just before your close body tag. -->
-        <script async defer src="https://buttons.github.io/buttons.js"></script>
-        <style>
-            .selection       { color: rgb(180, 30,  30); }
-            .expansion       { color: rgb(30, 180,  30); }
-            .simulation      { color: rgb(30, 180, 180); }
-            .backpropagation { color: rgb(30,  30, 180); }
-        </style>
     </head>
     <body onLoad="setupInteractive()">
-        <h1>MCTS Tic-tac-toe (<i>Monte Carlo Tree Search</i>) - <a class="github-button" href="https://github.com/vgarciasc/mcts-viz" data-icon="octicon-star" data-size="large" data-show-count="true" aria-label="Star vgarciasc/mcts-viz on GitHub">Star</a></h1>
-        <div style="width: auto; float: left; border: solid 1px black; padding: 1em;">
-            <div id="canvascontainer"></div>
-            <p id="starting_player_area">
-                <b>Who will start the game?</b>
-                <br>
-                <button onclick="myp5.selectStartingPlayer(0)">HUMAN (You!)</button>
-                <button onclick="myp5.selectStartingPlayer(1)">MACHINE</button>
-            </p>
-            <p id="whoseturn_area">
-                <b>Whose turn?</b> <span id="whoseturn">HUMAN</span>
-            </p>
-            <div id="machine_controls_area">
-                <b>Machine controls:</b>
-                <div style="background-color: rgb(230, 230, 230); padding: 1em">                
-                    <button onclick="myp5.machineRandomMove()">Make random move</button>
-                    <br>
-                    <button onclick="myp5.machineMctsMove()">Make MCTS move</button>
-                    <br>
-                    <br>
-                    Run MCTS for:
-                    <br>
-                    <input id="mcts_timeout_slider" type="range" min="100" max="2000" value="1000" step="100"/>
-                    <br>
-                    <span id="mcts_timeout_span"><b>1</b></span> iterations
+        <div class="app-container">
+            <!-- CỘT 1: BÀN CỜ & ĐIỀU KHIỂN GAME (TRÁI) -->
+            <div class="left-panel">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0; font-size: 14px; color: #0f172a;">🎮 Tic-Tac-Toe</h3>
+                    <button onclick="myp5.reset()" style="font-size: 10px; padding: 2px 6px;">Làm mới</button>
+                </div>
+
+                <div id="canvascontainer" style="display: flex; justify-content: center;"></div>
+                
+                <!-- CHẾ ĐỘ TỰ CHƠI / XẾP THẾ CỜ CUSTOM -->
+                <div>
+                    <button id="btn_custom_mode" style="width: 100%; border: 1px dashed #0284c7; background: #f0f9ff; color: #0369a1; font-weight: 600;" onclick="customBoardManager.toggleCustomMode()">✏️ Tự chơi / Xếp thế cờ</button>
+                    
+                    <div id="custom_mode_panel" style="display: none; background: #fffbeb; border: 1px solid #fde68a; border-radius: 6px; padding: 8px; margin-top: 6px;">
+                        <b style="font-size: 11px; color: #92400e;">1. Chọn thế cờ mẫu (Presets):</b>
+                        <select id="select_presets" style="width: 100%; font-size: 11px; padding: 4px; margin: 3px 0 6px 0;" onchange="customBoardManager.setPreset(this.value)">
+                            <option value="">-- Chọn thế cờ mẫu --</option>
+                            <option value="fork_corner">1. Bẫy Fork Góc (X ở 2 góc)</option>
+                            <option value="block_win">2. Thế Buộc Chặn (X sắp 3 ô)</option>
+                            <option value="double_threat">3. Chặn Đôi Hiểm Hóc (Endgame)</option>
+                            <option value="side_trap">4. Bẫy Cạnh (X ô 4, O ô 1)</option>
+                        </select>
+
+                        <b style="font-size: 11px; color: #92400e;">2. Lưu thế cờ này (Browser Storage):</b>
+                        <div style="display: flex; gap: 4px; margin-top: 3px;">
+                            <input id="input_board_name" type="text" placeholder="Đặt tên thế cờ..." style="flex: 1; font-size: 11px; padding: 3px 5px; border: 1px solid #cbd5e1; border-radius: 4px;" />
+                            <button onclick="customBoardManager.saveCurrentBoard()" style="font-size: 11px; padding: 3px 6px;">Lưu</button>
+                        </div>
+
+                        <div style="margin-top: 6px;">
+                            <select id="select_saved_boards" style="width: 100%; font-size: 11px; padding: 4px;" onchange="customBoardManager.loadSelectedSavedBoard(this.value)">
+                                <option value="">-- Thế cờ bạn đã lưu --</option>
+                            </select>
+                            <div style="display: flex; gap: 4px; margin-top: 4px;">
+                                <button onclick="customBoardManager.deleteCurrentSavedBoard()" style="flex: 1; font-size: 10px; color: #b91c1c; padding: 2px 4px;">Xóa đã chọn</button>
+                                <button onclick="customBoardManager.clearBoard()" style="flex: 1; font-size: 10px; padding: 2px 4px;">Bàn cờ trống</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="starting_player_area">
+                    <b style="font-size: 12px;">Ai đi tiếp theo?</b>
+                    <div style="display: flex; gap: 6px; margin-top: 4px;">
+                        <button style="flex: 1;" onclick="myp5.selectStartingPlayer(0)">Người (X)</button>
+                        <button style="flex: 1;" onclick="myp5.selectStartingPlayer(1)">Máy (O)</button>
+                    </div>
+                </div>
+                
+                <div id="whoseturn_area" style="font-size: 13px;">
+                    <b>Lượt đi:</b> <span id="whoseturn" style="font-weight: bold; color: #0284c7;">HUMAN</span>
+                </div>
+                
+                <div id="machine_controls_area">
+                    <b style="font-size: 12px;">Điều khiển AI MCTS:</b>
+                    <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 6px; padding: 8px; margin-top: 4px;">                
+                        <button style="width: 100%; margin-bottom: 6px;" onclick="myp5.machineRandomMove()">Nước đi ngẫu nhiên</button>
+                        <button style="width: 100%; margin-bottom: 8px; background: #0284c7; color: white; border-color: #0369a1; font-weight: bold;" onclick="myp5.machineMctsMove()">Chạy thuật toán MCTS</button>
+                        
+                        <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; margin-bottom: 2px;">
+                            <span>Số Rollouts:</span>
+                            <b id="mcts_timeout_span" style="color: #0f172a; font-size: 12px;">100</b>
+                        </div>
+                        <input id="mcts_timeout_slider" type="range" min="10" max="2000" value="1000" step="10" style="width: 100%;"/>
+                        
+                        <div style="display: flex; gap: 3px; margin-top: 4px;">
+                            <button style="flex: 1; font-size: 10px; padding: 2px 2px;" onclick="customBoardManager.setQuickRollouts(10)">10</button>
+                            <button style="flex: 1; font-size: 10px; padding: 2px 2px;" onclick="customBoardManager.setQuickRollouts(25)">25</button>
+                            <button style="flex: 1; font-size: 10px; padding: 2px 2px;" onclick="customBoardManager.setQuickRollouts(50)">50</button>
+                            <button style="flex: 1; font-size: 10px; padding: 2px 2px;" onclick="customBoardManager.setQuickRollouts(100)">100</button>
+                            <button style="flex: 1; font-size: 10px; padding: 2px 2px;" onclick="customBoardManager.setQuickRollouts(250)">250</button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="game_over_area" style="background: #fef08a; border: 1px solid #facc15; border-radius: 6px; padding: 10px; text-align: center;">
+                    <b>Kết quả:</b> <span id="game_over_winner" style="font-weight: bold; color: #b45309;">HUMAN</span>!
+                    <div style="margin-top: 8px;">
+                        <button onclick="myp5.reset()" style="background: #eab308; color: white; border: none; font-weight: bold;">Chơi lại ván mới</button>
+                    </div>
                 </div>
             </div>
-            <div id="game_over_area">
-                <b>The winner is...</b> <span id="game_over_winner">HUMAN</span>!
-                <br>
-                <center>
-                    <button onclick="myp5.reset()">Restart game</button>
-                </center>
+
+            <!-- CỘT 2: KHUNG VẼ CÂY MCTS (GIỮA) -->
+            <div class="center-panel">
+                <div class="action-bar">
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <span style="font-size: 11px; color: #64748b;">Hành động hiện tại:</span>
+                        <div>
+                            <span id="current_action_kind" class="badge">---</span>
+                            <span id="current_action_count" style="font-size: 11px; color: #64748b;">(0/0)</span>
+                        </div>
+                        <button id="btn_next_action" disabled>Bước tiếp theo &gt;</button>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 2px;">
+                        <span style="font-size: 11px; color: #64748b;">Vòng lặp (Rollout):</span>
+                        <span id="current_iteration_count" style="font-size: 12px; font-weight: 600;">(0/0)</span>
+                        <button id="btn_next_iteration" disabled>Xong 1 Rollout &gt;&gt;</button>
+                    </div>
+                    
+                    <div style="margin-left: auto; display: flex; gap: 8px;">
+                        <button id="btn_last_step" disabled style="background: #f8fafc;">Xem cây hoàn chỉnh &gt;&gt;&gt;</button>
+                        <button id="btn_make_play" disabled style="background: #22c55e; color: white; border-color: #16a34a; font-weight: bold;">Đánh nước này</button>
+                    </div>
+                </div>
+                
+                <div id="tree_vis"></div>
             </div>
-        </div>
-        <div style="width: auto; margin-left: 2em; float: left; border: solid 1px black">
-            <div style="border: solid 1px lightgrey; height: 70px">
-                <div style="float: left; height: 100%; width: auto; padding: 0.25em">
-                    <b>Current action</b>:
-                    <br>
-                    <span id="current_action_count">(0/0)</span>
-                    <br>
-                    <span id="current_action_kind">---</span>
-                    <br>
-                    <button id="btn_next_action" disabled>next action &gt;</button>
+
+            <!-- CỘT 3: SIDEBAR CÔNG THỨC & THỐNG KÊ (PHẢI) -->
+            <div class="right-panel" id="sidebar_panel">
+                <div class="sidebar-card">
+                    <div class="sidebar-title">
+                        <span>1. Pha Thuật Toán</span>
+                        <span id="sb_phase_badge" class="badge">Chờ</span>
+                    </div>
+                    <div id="sb_phase_desc" style="font-size: 12px; color: #475569;">
+                        Nhấn <i>"Chạy thuật toán MCTS"</i> ở cột trái để bắt đầu mô phỏng từng bước.
+                    </div>
                 </div>
-                <div style="float: left; height: 100%; width: auto; padding: 0.25em;">
-                    <b>Current iteration</b>:
-                    <br>
-                    <span id="current_iteration_count">(0/0)</span>
-                    <br>
-                    <br>
-                    <button id="btn_next_iteration" disabled>next iteration &gt;&gt;</button>
+
+                <div class="sidebar-card">
+                    <div class="sidebar-title">
+                        <span>2. Công thức & Thay số</span>
+                    </div>
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 4px; padding: 6px; font-family: monospace; font-size: 11px; margin-bottom: 6px;">
+                        <b>UCB1</b> = (V / N) + c * √(ln(N_parent) / N)
+                    </div>
+                    <div id="sb_formula_sub" style="font-size: 12px; font-family: monospace; color: #0284c7; background: #f0f9ff; padding: 6px; border-radius: 4px;">
+                        UCB1 = --
+                    </div>
                 </div>
-                <div style="float: left; height: 100%; width: auto; margin-top: 0.2em; margin-bottom: 0.2em;">
-                    <button style="width: 200px; height: 45%; margin-bottom: 0.2em;" id="btn_last_step" disabled>visualize last step &gt;&gt;&gt;</button>
-                    <br>
-                    <button style="width: 200px; height: 45%;" id="btn_make_play" disabled>make play</button>
+
+                <div class="sidebar-card">
+                    <div class="sidebar-title">
+                        <span>3. So sánh các nhánh con</span>
+                    </div>
+                    <div id="sb_candidates_area" style="font-size: 11px; color: #64748b;">
+                        Chưa có dữ liệu nhánh con.
+                    </div>
+                </div>
+
+                <div class="sidebar-card">
+                    <div class="sidebar-title">
+                        <span>4. Chẩn đoán & Thống kê</span>
+                    </div>
+                    <div id="sb_diagnostics_area" style="font-size: 12px; color: #475569; line-height: 1.5;">
+                        • Thời gian tính: <b id="stat_time">-- ms</b><br>
+                        • Số nút đã tạo: <b id="stat_nodes">--</b><br>
+                        • Bao phủ không gian mẫu: <b id="stat_coverage">--%</b>
+                    </div>
                 </div>
             </div>
-            <div id="tree_vis"></div>
         </div>
     </body>
 </html>

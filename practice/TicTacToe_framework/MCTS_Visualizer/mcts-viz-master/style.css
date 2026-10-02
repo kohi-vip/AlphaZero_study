@@ -1,7 +1,168 @@
-body {
-    font-family: monospace;
+* {
+    box-sizing: border-box;
 }
 
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif, monospace;
+    margin: 0;
+    padding: 10px;
+    background-color: #f1f5f9;
+    color: #1e293b;
+    overflow-x: hidden;
+}
+
+/* --- BỐ CỤC 3 CỘT RESPONSIVE DASHBOARD --- */
+.app-container {
+    display: flex;
+    flex-direction: row;
+    gap: 12px;
+    width: 100%;
+    height: calc(100vh - 20px);
+}
+
+/* CỘT 1: BÀN CỜ & ĐIỀU KHIỂN (TRÁI) */
+.left-panel {
+    width: 270px;
+    flex-shrink: 0;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 12px;
+    overflow-y: auto;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* CỘT 2: KHUNG VẼ CÂY MCTS (GIỮA - RỘNG LỚN) */
+.center-panel {
+    flex: 1;
+    min-width: 500px;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+/* CỘT 3: SIDEBAR THÔNG TIN & CÔNG THỨC (PHẢI) */
+.right-panel {
+    width: 360px;
+    flex-shrink: 0;
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    padding: 12px;
+    overflow-y: auto;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* THANH ĐIỀU KHIỂN TUA BƯỚC MCTS */
+.action-bar {
+    border-bottom: 1px solid #e2e8f0;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f8fafc;
+    flex-shrink: 0;
+}
+
+#tree_vis {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    position: relative;
+    background: #ffffff;
+}
+
+/* NÚT BẤM CHUNG */
 button {
-    font-family: monospace;
+    font-family: inherit;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    border: 1px solid #cbd5e1;
+    background: #ffffff;
+    color: #1e293b;
+    padding: 6px 10px;
+    border-radius: 6px;
+    transition: all 0.15s ease-in-out;
+}
+
+button:hover:not(:disabled) {
+    background: #f1f5f9;
+    border-color: #94a3b8;
+}
+
+button:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+}
+
+/* THẺ TRONG SIDEBAR */
+.sidebar-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    padding: 10px 12px;
+}
+
+.sidebar-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #0f172a;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* BADGE MÀU SẮC CHO CÁC PHA MCTS */
+.badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+
+.selection       { background: #fee2e2; color: #b91c1c; border: 1px solid #f87171; }
+.expansion       { background: #dcfce7; color: #15803d; border: 1px solid #4ade80; }
+.simulation      { background: #e0f2fe; color: #0369a1; border: 1px solid #38bdf8; }
+.backpropagation { background: #e0e7ff; color: #4338ca; border: 1px solid #818cf8; }
+.finish          { background: #fef08a; color: #854d0e; border: 1px solid #facc15; }
+
+/* BẢNG SO SÁNH NHÁNH CON */
+.formula-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 11px;
+    margin-top: 6px;
+}
+
+.formula-table th, .formula-table td {
+    padding: 4px 6px;
+    border: 1px solid #cbd5e1;
+    text-align: center;
+}
+
+.formula-table th {
+    background: #e2e8f0;
+    font-weight: 600;
+}
+
+.formula-table tr.highlighted {
+    background: #fef08a !important;
+    font-weight: bold;
 }
