@@ -120,7 +120,26 @@ function updateInterface() {
   document.getElementById("current_iteration_count").innerHTML = iteration_progress_bar;
 }
 
+function getDisplayPos(pos) {
+  if (pos === null || pos === undefined || pos === "?") return "?";
+  let num = Number(pos);
+  return isNaN(num) ? "?" : (num + 1);
+}
+
+function highlightAlgoLine(activeLineNum, actionKind) {
+  for (let i = 1; i <= 7; i++) {
+    let lineEl = document.getElementById("algo_line_" + i);
+    if (lineEl) {
+      lineEl.className = "algo-line";
+      if (i === activeLineNum && actionKind) {
+        lineEl.classList.add("active-" + actionKind);
+      }
+    }
+  }
+}
+
 function resetLiveSidebar() {
+  highlightAlgoLine(0, null);
   let badge = document.getElementById("sb_phase_badge");
   let desc = document.getElementById("sb_phase_desc");
   let formula = document.getElementById("sb_formula_sub");
@@ -157,25 +176,56 @@ function updateLiveSidebar(action) {
 
   switch (action.kind) {
     case "selection":
-      desc.innerHTML = "Duyệt từ nút gốc xuống nút lá theo chỉ số <b>UCB1 lớn nhất</b>.";
+      highlightAlgoLine(2, "selection");
       if (targetNode && targetParent) {
+        let pPos = (targetNode.data.move) ? getDisplayPos(targetNode.data.move.position) : "?";
+        desc.innerHTML = `
+          <div style="margin-bottom: 4px;">
+            <b>Dòng 2: Selection (Chọn lọc nhánh)</b>
+          </div>
+          <div style="font-size: 11px; color: #475569; line-height: 1.45;">
+            • <b>Cơ chế duyệt:</b> Theo biến <b>UCB1 lớn nhất</b> (duyệt có chủ đích, không đi ngẫu nhiên).<br>
+            • <b>Mục tiêu:</b> Cân bằng giữa Khai thác (Exploitation) nhánh thắng nhiều và Khám phá (Exploration) nhánh ít thử.<br>
+            • <b>Biến đang chạy:</b> Nút ID #${targetNode.id} (Ô [${pPos}]), Nút cha ID #${targetParent.id}.
+          </div>
+        `;
         showUCB1Formula(targetNode, targetParent, formula);
         showCandidatesTable(targetParent, targetNode.id, candidates);
       } else if (targetNode && targetNode.isRoot()) {
+        desc.innerHTML = `
+          <div style="margin-bottom: 4px;">
+            <b>Dòng 2: Selection (Bắt đầu từ Root)</b>
+          </div>
+          <div style="font-size: 11px; color: #475569; line-height: 1.45;">
+            • Bắt đầu lượt duyệt tại nút Gốc (Root) của bàn cờ hiện tại.<br>
+            • <b>Biến:</b> N = ${targetNode.data.simulations}, V = ${targetNode.data.value}.
+          </div>
+        `;
         formula.innerHTML = `<b>Nút Gốc (Root):</b> N = ${targetNode.data.simulations}, V = ${targetNode.data.value}`;
         showCandidatesTable(targetNode, null, candidates);
       }
       break;
 
     case "expansion":
-      let pos = (final_tree && final_tree.get(action.node_id).data.move) ? final_tree.get(action.node_id).data.move.position : "?";
-      desc.innerHTML = `Mở rộng thêm nút con mới tại <b>ô số ${pos}</b> từ nút lá chưa xét hết.`;
+      highlightAlgoLine(4, "expansion");
+      let pos0 = (final_tree && final_tree.get(action.node_id).data.move) ? final_tree.get(action.node_id).data.move.position : null;
+      let displayPos = getDisplayPos(pos0);
+      desc.innerHTML = `
+        <div style="margin-bottom: 4px;">
+          <b>Dòng 4: Expansion (Mở rộng nhánh mới)</b>
+        </div>
+        <div style="font-size: 11px; color: #475569; line-height: 1.45;">
+          • <b>Cơ chế duyệt:</b> Chọn <b>ngẫu nhiên đều (Uniform Random)</b> trong tập các ô hợp lệ chưa từng được mở rộng.<br>
+          • <b>Tại sao ngẫu nhiên?</b> Khi nút lá còn ô trống chưa thử, mọi nhánh chưa duyệt đều cần cơ hội bình đẳng được khám phá.<br>
+          • <b>Biến đang chạy:</b> Mở rộng tại <b>ô số [${displayPos}]</b>.
+        </div>
+      `;
       formula.innerHTML = `
-        <div><b>Khởi tạo nút mới (Ô ${pos}):</b></div>
-        <div style="font-size: 11px; color: #475569; margin-top: 2px;">
-          • Giá trị (V) = 0<br>
-          • Lượt thăm (N) = 0<br>
-          • Điểm UCB1 = ∞ (Ưu tiên mô phỏng ít nhất 1 lần)
+        <div style="font-weight: 600; color: #15803d;">Khởi tạo nút mới: Ô [${displayPos}]</div>
+        <div style="font-size: 11px; color: #475569; margin-top: 3px; line-height: 1.4;">
+          • Điểm tích lũy (V) = <b>0</b><br>
+          • Lượt thăm (N) = <b>0</b><br>
+          • Điểm UCB1 ngầm định = <b>&infin;</b> (Ưu tiên duyệt ít nhất 1 lần)
         </div>
       `;
       if (targetParent) {
@@ -184,31 +234,54 @@ function updateLiveSidebar(action) {
       break;
 
     case "simulation":
+      highlightAlgoLine(5, "simulation");
       let res = action.new_data ? action.new_data.result : "";
       let resText = (res === "m") ? "<span style='color: #dc2626; font-weight: bold;'>Máy (O) Thắng</span>" : 
                     (res === "h" ? "<span style='color: #2563eb; font-weight: bold;'>Người (X) Thắng</span>" : "<b>Hòa (Draw)</b>");
-      let deltaScore = (res === "m") ? "+1 điểm" : (res === "h" ? "-1 điểm" : "0 điểm");
-      desc.innerHTML = `Thực hiện Rollout ngẫu nhiên cho đến kết thúc ván: ${resText}.`;
+      let deltaScore = (res === "m") ? "+1 điểm (Máy)" : (res === "h" ? "-1 điểm (Người)" : "0 điểm (Hòa)");
+      desc.innerHTML = `
+        <div style="margin-bottom: 4px;">
+          <b>Dòng 5: Simulation (Rollout mô phỏng)</b>
+        </div>
+        <div style="font-size: 11px; color: #475569; line-height: 1.45;">
+          • <b>Cơ chế duyệt:</b> Đánh <b>ngẫu nhiên hoàn toàn (Uniform Random Rollout Policy)</b>.<br>
+          • <b>Tại sao ngẫu nhiên?</b> Hai bên X và O luân phiên đi ngẫu nhiên đến khi kết thúc ván để ước lượng nhanh xác suất thắng mà không cần tri thức bàn cờ phức tạp.<br>
+          • <b>Kết quả Rollout:</b> ${resText}.
+        </div>
+      `;
       formula.innerHTML = `
-        <div><b>Kết quả Rollout:</b> ${resText}</div>
-        <div style="font-size: 11px; color: #475569; margin-top: 2px;">
-          • Điểm lan truyền: <b>${deltaScore}</b><br>
-          • Ván cờ mô phỏng kết thúc, chuẩn bị cập nhật ngược lên cây (Backpropagation).
+        <div style="font-weight: 600; color: #0369a1;">Kết quả Rollout ván cờ: ${resText}</div>
+        <div style="font-size: 11px; color: #475569; margin-top: 3px; line-height: 1.4;">
+          • Giá trị lan truyền: <b>${deltaScore}</b><br>
+          • Kết thúc ván mô phỏng, chuẩn bị cập nhật ngược lên cây (Backpropagation).
         </div>
       `;
       break;
 
     case "backpropagation":
+      highlightAlgoLine(6, "backpropagation");
       let oldV = action.old_data ? action.old_data.old_value : 0;
       let newV = action.new_data ? action.new_data.new_value : 0;
       let oldN = action.old_data ? action.old_data.old_visits : 0;
       let newN = action.new_data ? action.new_data.new_visits : 0;
-      desc.innerHTML = `Lan truyền kết quả ngược lên gốc: Cập nhật <b>N: ${oldN} ➔ ${newN}</b>, <b>V: ${oldV} ➔ ${newV}</b>.`;
       let winRate = (newN > 0) ? (newV / newN).toFixed(3) : "0.000";
+      let vDiff = newV - oldV;
+      let vDiffText = vDiff > 0 ? `+${vDiff}` : `${vDiff}`;
+      desc.innerHTML = `
+        <div style="margin-bottom: 4px;">
+          <b>Dòng 6: Backpropagation (Lan truyền ngược)</b>
+        </div>
+        <div style="font-size: 11px; color: #475569; line-height: 1.45;">
+          • <b>Cơ chế:</b> Cập nhật giá trị <b>ngược dòng từ nút lá về nút gốc</b> theo đúng đường đi của nhánh vừa duyệt.<br>
+          • <b>Biến đang chạy:</b> Nút ID #${action.node_id}:<br>
+          &nbsp;&nbsp;- Lượt thăm: <b>N: ${oldN} ➔ ${newN}</b> (+1)<br>
+          &nbsp;&nbsp;- Giá trị tích lũy: <b>V: ${oldV} ➔ ${newV}</b> (${vDiffText})
+        </div>
+      `;
       formula.innerHTML = `
-        <div><b>Cập nhật nút:</b></div>
-        <div style="font-size: 11px; color: #475569; margin-top: 2px;">
-          • Lượt thăm mới (N): <b>${newN}</b> (+1)<br>
+        <div style="font-weight: 600; color: #4338ca;">Cập nhật nút (ID #${action.node_id}):</div>
+        <div style="font-size: 11px; color: #475569; margin-top: 3px; line-height: 1.4;">
+          • Lượt thăm mới (N): <b>${newN}</b><br>
           • Điểm tích lũy (V): <b>${newV}</b><br>
           • Tỉ lệ thắng trung bình (V/N): <b>${winRate}</b>
         </div>
@@ -219,14 +292,25 @@ function updateLiveSidebar(action) {
       break;
 
     case "finish":
+      highlightAlgoLine(7, "finish");
       let bestMoveNode = reconstructed_tree ? reconstructed_tree.get(action.node_id) : null;
-      let bestPos = (bestMoveNode && bestMoveNode.data.move) ? bestMoveNode.data.move.position : "?";
-      desc.innerHTML = `<span style='color: #166534; font-weight: bold;'>HOÀN THÀNH TÌM KIẾM!</span> Chọn nước đi tối ưu tại <b>ô số ${bestPos}</b>.`;
+      let bestPos = (bestMoveNode && bestMoveNode.data.move) ? getDisplayPos(bestMoveNode.data.move.position) : "?";
+      let bestN = bestMoveNode ? bestMoveNode.data.simulations : 0;
+      desc.innerHTML = `
+        <div style="margin-bottom: 4px;">
+          <b style="color: #166534;">Dòng 7: Hoàn thành tìm kiếm (Make Move)</b>
+        </div>
+        <div style="font-size: 11px; color: #475569; line-height: 1.45;">
+          • <b>Cơ chế quyết định:</b> Chọn theo <b>Max N (Lượt duyệt N nhiều nhất)</b>.<br>
+          • <b>Tại sao không dùng UCB1?</b> Ở bước ra quyết định, điểm Khám phá không còn cần thiết; số lượt duyệt N phản ánh độ tin cậy hội tụ cao nhất.<br>
+          • <b>Nước đi tối ưu:</b> Ô số <b>[${bestPos}]</b> với <b>N = ${bestN}</b> lượt mô phỏng.
+        </div>
+      `;
       formula.innerHTML = `
-        <div><b>Nước đi tối ưu: Ô ${bestPos}</b></div>
-        <div style="font-size: 11px; color: #166534; margin-top: 2px;">
-          Tiêu chuẩn chọn: <b>Max N (Lượt mô phỏng nhiều nhất)</b>.<br>
-          Số lượt duyệt lớn đảm bảo thuật toán đã hội tụ và giảm thiểu rủi ro ngẫu nhiên.
+        <div style="color: #166534; font-weight: 600;">Nước đi được chọn: Ô [${bestPos}]</div>
+        <div style="font-size: 11px; color: #475569; margin-top: 3px; line-height: 1.4;">
+          Số lượt duyệt lớn nhất: <b>N = ${bestN}</b>.<br>
+          Độ tin cậy thống kê cao nhất trong số các lựa chọn khả dĩ.
         </div>
       `;
       if (reconstructed_tree) {
@@ -240,10 +324,13 @@ function showUCB1Formula(node, parent, container) {
   let v = node.data.value;
   let n = node.data.simulations;
   let np = parent.data.simulations;
-  let pos = (node.data.move) ? node.data.move.position : "?";
+  let pos = (node.data.move) ? getDisplayPos(node.data.move.position) : "?";
 
   if (n === 0) {
-    container.innerHTML = `<div><b>Ô ${pos}:</b> N = 0 ➔ UCB1 = ∞</div>`;
+    container.innerHTML = `
+      <div style="font-weight: 600; color: #0284c7; margin-bottom: 2px;">Đang xét ô [${pos}]:</div>
+      <div style="font-size: 11px; color: #475569;">N = 0 &rarr; UCB1 = <b>&infin;</b> (Chưa từng được mô phỏng)</div>
+    `;
     return;
   }
 
@@ -253,12 +340,33 @@ function showUCB1Formula(node, parent, container) {
   let ucb1 = exploitation + exploration;
 
   container.innerHTML = `
-    <div style="font-weight: 600; margin-bottom: 3px;">Đang xét ô [${pos}]:</div>
-    <div style="font-size: 11px; line-height: 1.4;">
-      • Khai thác (V/N) = ${v} / ${n} = <b>${exploitation.toFixed(3)}</b><br>
-      • Khám phá = √[2 * ln(${np}) / ${n}] = <b>${exploration.toFixed(3)}</b><br>
-      <div style="margin-top: 4px; padding-top: 4px; border-top: 1px dashed #7dd3fc; color: #0369a1; font-weight: bold;">
-        ➔ UCB1 = ${exploitation.toFixed(3)} + ${exploration.toFixed(3)} = ${ucb1.toFixed(3)}
+    <div style="font-weight: 600; color: #0369a1; margin-bottom: 4px;">
+      Đang đánh giá ô [${pos}]:
+    </div>
+    <div class="math-equation-box" style="margin-bottom: 6px; padding: 6px 8px;">
+      <div class="math-eq" style="font-size: 12px;">
+        <span style="font-weight: 600; color: #0284c7;">UCB1</span>&nbsp;=&nbsp;
+        <span class="math-frac">
+          <span class="math-num" style="color: #b91c1c; font-weight: 600;">${v}</span>
+          <span class="math-den" style="font-weight: 600;">${n}</span>
+        </span>
+        &nbsp;+&nbsp;1.414 &middot;&nbsp;
+        <span class="math-sqrt">
+          <span class="math-radical">&radic;</span>
+          <span class="math-sqrt-content">
+            <span class="math-frac">
+              <span class="math-num">ln(${np})</span>
+              <span class="math-den">${n}</span>
+            </span>
+          </span>
+        </span>
+      </div>
+    </div>
+    <div style="font-size: 11px; line-height: 1.5; color: #334155;">
+      • <b>Khai thác (Exploitation):</b> ${v}/${n} = <b style="color: #b91c1c;">${exploitation.toFixed(3)}</b><br>
+      • <b>Khám phá (Exploration):</b> 1.414 &times; &radic;[ln(${np})/${n}] = <b style="color: #0284c7;">${exploration.toFixed(3)}</b><br>
+      <div style="margin-top: 4px; padding-top: 4px; border-top: 1px dashed #7dd3fc; color: #0f172a; font-weight: bold; font-size: 12px;">
+        ➔ Tổng UCB1 = ${exploitation.toFixed(3)} + ${exploration.toFixed(3)} = <span style="color: #0284c7;">${ucb1.toFixed(3)}</span>
       </div>
     </div>
   `;
@@ -276,7 +384,7 @@ function showCandidatesTable(parentNode, highlightedChildId, container) {
     <table class="formula-table">
       <thead>
         <tr>
-          <th>Ô</th>
+          <th>Ô (1-9)</th>
           <th>N</th>
           <th>V</th>
           <th>V/N</th>
@@ -287,7 +395,7 @@ function showCandidatesTable(parentNode, highlightedChildId, container) {
   `;
 
   for (let ch of children) {
-    let pos = (ch.data.move) ? ch.data.move.position : "?";
+    let pos = (ch.data.move) ? getDisplayPos(ch.data.move.position) : "?";
     let n = ch.data.simulations;
     let v = ch.data.value;
     let vn = (n > 0) ? (v / n).toFixed(2) : "-";

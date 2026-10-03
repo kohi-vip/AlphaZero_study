@@ -166,3 +166,140 @@ button:disabled {
     background: #fef08a !important;
     font-weight: bold;
 }
+
+/* ĐỊNH DẠNG CÔNG THỨC TOÁN ĐẸP (MATH EQUATION) */
+.math-equation-box {
+    background: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 8px 10px;
+    margin-bottom: 8px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.03);
+}
+
+.math-eq {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Cambria Math', 'Times New Roman', serif;
+    font-size: 13px;
+    color: #0f172a;
+    gap: 4px;
+    flex-wrap: wrap;
+}
+
+.math-frac {
+    display: inline-flex;
+    flex-direction: column;
+    vertical-align: middle;
+    text-align: center;
+    padding: 0 3px;
+}
+
+.math-num {
+    border-bottom: 1.5px solid #334155;
+    padding-bottom: 1px;
+    font-size: 11px;
+    line-height: 1.1;
+}
+
+.math-den {
+    padding-top: 1px;
+    font-size: 11px;
+    line-height: 1.1;
+}
+
+.math-sqrt {
+    display: inline-flex;
+    align-items: center;
+}
+
+.math-radical {
+    font-size: 16px;
+    line-height: 1;
+    margin-right: 1px;
+}
+
+.math-sqrt-content {
+    border-top: 1.5px solid #334155;
+    padding-top: 1px;
+    display: inline-flex;
+    align-items: center;
+}
+
+/* KHUNG THUẬT TOÁN TỪNG DÒNG (PSEUDOCODE HIGHLIGHT) */
+.algo-code-box {
+    background: #0f172a;
+    color: #cbd5e1;
+    border-radius: 6px;
+    padding: 6px 0;
+    font-family: 'Consolas', 'Courier New', monospace;
+    font-size: 11px;
+    margin-bottom: 8px;
+    overflow-x: auto;
+    border: 1px solid #334155;
+}
+
+.algo-line {
+    padding: 2px 8px;
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+}
+
+.algo-line-num {
+    color: #64748b;
+    font-size: 10px;
+    width: 14px;
+    text-align: right;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.algo-line-code {
+    flex: 1;
+    white-space: pre;
+}
+
+.algo-comment {
+    color: #94a3b8;
+    font-style: italic;
+}
+
+/* HIGHLIGHT TỪNG DÒNG THEO MÀU PHA THUẬT TOÁN */
+.algo-line.active-selection {
+    background: rgba(239, 68, 68, 0.28);
+    border-left-color: #ef4444;
+    color: #fecaca;
+    font-weight: 600;
+}
+
+.algo-line.active-expansion {
+    background: rgba(34, 197, 94, 0.28);
+    border-left-color: #22c55e;
+    color: #bbf7d0;
+    font-weight: 600;
+}
+
+.algo-line.active-simulation {
+    background: rgba(14, 165, 233, 0.28);
+    border-left-color: #0ea5e9;
+    color: #bae6fd;
+    font-weight: 600;
+}
+
+.algo-line.active-backpropagation {
+    background: rgba(99, 102, 241, 0.28);
+    border-left-color: #6366f1;
+    color: #e0e7ff;
+    font-weight: 600;
+}
+
+.algo-line.active-finish {
+    background: rgba(234, 179, 8, 0.28);
+    border-left-color: #eab308;
+    color: #fef08a;
+    font-weight: 600;
+}

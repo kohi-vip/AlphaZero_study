@@ -1,5 +1,3 @@
-/// <reference path="./lib/p5.global-mode.d.ts" />
-
 let TTT_BOARD;
 let canvas;
 
@@ -64,8 +62,7 @@ const s = (sketch) => {
     if (diagArea) {
       diagArea.innerHTML = `
         • Thời gian tính: <b id="stat_time">-- ms</b><br>
-        • Số nút đã tạo: <b id="stat_nodes">--</b><br>
-        • Bao phủ không gian mẫu: <b id="stat_coverage">--%</b>
+        • Số nút đã tạo: <b id="stat_nodes">--</b>
       `;
     }
   }

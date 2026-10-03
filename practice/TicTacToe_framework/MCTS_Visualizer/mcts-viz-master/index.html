@@ -34,10 +34,10 @@
                         <b style="font-size: 11px; color: #92400e;">1. Chọn thế cờ mẫu (Presets):</b>
                         <select id="select_presets" style="width: 100%; font-size: 11px; padding: 4px; margin: 3px 0 6px 0;" onchange="customBoardManager.setPreset(this.value)">
                             <option value="">-- Chọn thế cờ mẫu --</option>
-                            <option value="fork_corner">1. Bẫy Fork Góc (X ở 2 góc)</option>
-                            <option value="block_win">2. Thế Buộc Chặn (X sắp 3 ô)</option>
+                            <option value="fork_corner">1. Bẫy Fork Góc (X ở ô 1, 9, O ở ô 5)</option>
+                            <option value="block_win">2. Thế Buộc Chặn (X ở ô 1, 2)</option>
                             <option value="double_threat">3. Chặn Đôi Hiểm Hóc (Endgame)</option>
-                            <option value="side_trap">4. Bẫy Cạnh (X ô 4, O ô 1)</option>
+                            <option value="side_trap">4. Bẫy Cạnh (X ô 5, O ô 2)</option>
                         </select>
 
                         <b style="font-size: 11px; color: #92400e;">2. Lưu thế cờ này (Browser Storage):</b>
@@ -80,7 +80,7 @@
                             <span>Số Rollouts:</span>
                             <b id="mcts_timeout_span" style="color: #0f172a; font-size: 12px;">100</b>
                         </div>
-                        <input id="mcts_timeout_slider" type="range" min="10" max="2000" value="1000" step="10" style="width: 100%;"/>
+                        <input id="mcts_timeout_slider" type="range" min="10" max="10000" value="1000" step="10" style="width: 100%;"/>
                         
                         <div style="display: flex; gap: 3px; margin-top: 4px;">
                             <button style="flex: 1; font-size: 10px; padding: 2px 2px;" onclick="customBoardManager.setQuickRollouts(10)">10</button>
@@ -131,22 +131,73 @@
             <div class="right-panel" id="sidebar_panel">
                 <div class="sidebar-card">
                     <div class="sidebar-title">
-                        <span>1. Pha Thuật Toán</span>
+                        <span>1. Luồng Thuật Toán MCTS</span>
                         <span id="sb_phase_badge" class="badge">Chờ</span>
                     </div>
-                    <div id="sb_phase_desc" style="font-size: 12px; color: #475569;">
+
+                    <!-- KHUNG CODE TỪNG DÒNG THUẬT TOÁN (PSEUDOCODE HIGHLIGHT) -->
+                    <div class="algo-code-box">
+                        <div class="algo-line" id="algo_line_1">
+                            <span class="algo-line-num">1</span>
+                            <span class="algo-line-code"><b>function</b> MCTS_Iteration(root):</span>
+                        </div>
+                        <div class="algo-line" id="algo_line_2">
+                            <span class="algo-line-num">2</span>
+                            <span class="algo-line-code">  node ← Selection(root) <span class="algo-comment">// max UCB1</span></span>
+                        </div>
+                        <div class="algo-line" id="algo_line_3">
+                            <span class="algo-line-num">3</span>
+                            <span class="algo-line-code">  <b>if</b> not Terminal <b>and</b> not FullyExplored:</span>
+                        </div>
+                        <div class="algo-line" id="algo_line_4">
+                            <span class="algo-line-num">4</span>
+                            <span class="algo-line-code">      node ← Expansion(node) <span class="algo-comment">// Ngẫu nhiên</span></span>
+                        </div>
+                        <div class="algo-line" id="algo_line_5">
+                            <span class="algo-line-num">5</span>
+                            <span class="algo-line-code">  winner ← Simulation(node)  <span class="algo-comment">// Rollout ngẫu nhiên</span></span>
+                        </div>
+                        <div class="algo-line" id="algo_line_6">
+                            <span class="algo-line-num">6</span>
+                            <span class="algo-line-code">  Backpropagation(node, winner) <span class="algo-comment">// N+=1, V+=Δ</span></span>
+                        </div>
+                        <div class="algo-line" id="algo_line_7">
+                            <span class="algo-line-num">7</span>
+                            <span class="algo-line-code"><b>return</b> BestMove(root) <span class="algo-comment">// max(N lượt duyệt)</span></span>
+                        </div>
+                    </div>
+
+                    <!-- MÔ TẢ CHI TIẾT BIẾN & CƠ CHẾ DUYỆT -->
+                    <div id="sb_phase_desc" style="font-size: 11px; color: #475569; line-height: 1.45;">
                         Nhấn <i>"Chạy thuật toán MCTS"</i> ở cột trái để bắt đầu mô phỏng từng bước.
                     </div>
                 </div>
 
                 <div class="sidebar-card">
                     <div class="sidebar-title">
-                        <span>2. Công thức & Thay số</span>
+                        <span>2. Công thức UCB1 & Thay số</span>
                     </div>
-                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 4px; padding: 6px; font-family: monospace; font-size: 11px; margin-bottom: 6px;">
-                        <b>UCB1</b> = (V / N) + c * √(ln(N_parent) / N)
+                    <!-- ĐỊNH DẠNG CÔNG THỨC DẠNG EQUATION ĐẸP -->
+                    <div class="math-equation-box">
+                        <div class="math-eq">
+                            <span style="font-weight: 600; color: #0284c7;">UCB1</span>&nbsp;=&nbsp;
+                            <span class="math-frac">
+                                <span class="math-num">V<sub>i</sub></span>
+                                <span class="math-den">N<sub>i</sub></span>
+                            </span>
+                            &nbsp;+&nbsp;c &middot;&nbsp;
+                            <span class="math-sqrt">
+                                <span class="math-radical">&radic;</span>
+                                <span class="math-sqrt-content">
+                                    <span class="math-frac">
+                                        <span class="math-num">ln(N<sub>parent</sub>)</span>
+                                        <span class="math-den">N<sub>i</sub></span>
+                                    </span>
+                                </span>
+                            </span>
+                        </div>
                     </div>
-                    <div id="sb_formula_sub" style="font-size: 12px; font-family: monospace; color: #0284c7; background: #f0f9ff; padding: 6px; border-radius: 4px;">
+                    <div id="sb_formula_sub" style="font-size: 11px; color: #0284c7; background: #f0f9ff; border: 1px solid #bae6fd; padding: 6px 8px; border-radius: 4px;">
                         UCB1 = --
                     </div>
                 </div>
@@ -166,8 +217,7 @@
                     </div>
                     <div id="sb_diagnostics_area" style="font-size: 12px; color: #475569; line-height: 1.5;">
                         • Thời gian tính: <b id="stat_time">-- ms</b><br>
-                        • Số nút đã tạo: <b id="stat_nodes">--</b><br>
-                        • Bao phủ không gian mẫu: <b id="stat_coverage">--%</b>
+                        • Số nút đã tạo: <b id="stat_nodes">--</b>
                     </div>
                 </div>
             </div>

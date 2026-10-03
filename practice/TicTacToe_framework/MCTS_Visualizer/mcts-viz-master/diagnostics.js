@@ -1,4 +1,4 @@
-﻿// =============================================================================
+// =============================================================================
 // MODULE CHẨN ĐOÁN THẮNG / THUA & THỐNG KÊ SAU VÁN ĐẤU (POST-GAME DIAGNOSTICS)
 // =============================================================================
 
@@ -28,14 +28,9 @@ function recordMCTSSearch(searchTimeMs, rollouts, totalNodes, player) {
 
     let statTime = document.getElementById("stat_time");
     let statNodes = document.getElementById("stat_nodes");
-    let statCoverage = document.getElementById("stat_coverage");
 
     if (statTime) statTime.innerText = `${searchTimeMs} ms`;
     if (statNodes) statNodes.innerText = totalNodes;
-    if (statCoverage) {
-        let pct = ((totalNodes / TOTAL_TICTACTOE_STATES) * 100).toFixed(2);
-        statCoverage.innerText = `${pct}% (${totalNodes}/${TOTAL_TICTACTOE_STATES})`;
-    }
 }
 
 /**
@@ -93,43 +88,6 @@ function analyzeGameOutcome(winner, board) {
     let opponentMark = (winner === "h") ? "m" : "h";
     let winnerName = (winner === "h") ? "Người chơi (X)" : (winner === "m" ? "Máy MCTS (O)" : "Hòa cờ");
 
-    // 1. Phân tích Kỹ thuật MCTS (Rollouts)
-    let rollouts = lastMCTSSearchInfo.rollouts || 100;
-    if (rollouts < 50) {
-        reasons.push({
-            category: "MCTS Technical",
-            badge: "Rollout thấp",
-            type: "warning",
-            text: `Số vòng lặp MCTS rất ít (${rollouts} rollouts). Cây MCTS chưa hội tụ đủ độ sâu để phát hiện các bẫy phản công phức tạp.`
-        });
-    } else {
-        reasons.push({
-            category: "MCTS Technical",
-            badge: "Hội tụ tốt",
-            type: "success",
-            text: `Số vòng lặp MCTS (${rollouts} rollouts) đạt mức đánh giá xác suất đủ tốt cho các thế cờ thông thường.`
-        });
-    }
-
-    // 2. Độ bao phủ không gian mẫu (State-Space Coverage)
-    let totalNodes = lastMCTSSearchInfo.totalNodes || 0;
-    let coveragePct = ((totalNodes / TOTAL_TICTACTOE_STATES) * 100).toFixed(2);
-    if (totalNodes < 40) {
-        reasons.push({
-            category: "State-Space",
-            badge: "Khám phá mỏng",
-            type: "warning",
-            text: `Cây MCTS chỉ mở rộng ${totalNodes} nút (~${coveragePct}% không gian 5,478 thế cờ), thuật toán tập trung khai thác nông.`
-        });
-    } else {
-        reasons.push({
-            category: "State-Space",
-            badge: "Bao phủ sâu",
-            type: "info",
-            text: `Đã sinh ra ${totalNodes} nút trạng thái (~${coveragePct}% không gian mẫu), bao quát hầu hết các phản hồi từ vị trí hiện tại.`
-        });
-    }
-
     // 3. Game-Theoretic & Bẫy Fork (Lý thuyết trò chơi)
     if (winner === "h" || winner === "m") {
         let forkTraps = detectForks(board, winner);
@@ -182,16 +140,15 @@ function renderPostGameDiagnostics(winner, board) {
 
     let reasons = analyzeGameOutcome(winner, board);
     let totalNodes = lastMCTSSearchInfo.totalNodes || 0;
-    let coveragePct = ((totalNodes / TOTAL_TICTACTOE_STATES) * 100).toFixed(2);
     let winnerText = (winner === "h") ? "Người chơi (X) Thắng" : (winner === "m" ? "Máy MCTS (O) Thắng" : "Hòa cờ (Draw)");
 
     let html = `
         <div style="margin-bottom: 8px; padding: 6px 8px; border-radius: 4px; background: #e0f2fe; border: 1px solid #7dd3fc;">
             <b>Kết quả:</b> <span style="font-weight: bold; color: #0369a1;">${winnerText}</span><br>
-            • Thời gian tính: <b>${lastMCTSSearchInfo.searchTimeMs} ms</b><br>
-            • Nút đã tạo: <b>${totalNodes}</b> / ${TOTAL_TICTACTOE_STATES} (${coveragePct}%)
+            • Thời gian tính MCTS: <b>${lastMCTSSearchInfo.searchTimeMs} ms</b><br>
+            • Số nút đã sinh trong cây: <b>${totalNodes}</b>
         </div>
-        <div style="font-weight: 600; font-size: 11px; margin-bottom: 4px; color: #334155;">NGUYÊN NHÂN & CHẨN ĐOÁN (4 DANH MỤC):</div>
+        <div style="font-weight: 600; font-size: 11px; margin-bottom: 4px; color: #334155;">PHÂN TÍCH & NGUYÊN NHÂN THẮNG / THUA:</div>
         <div style="display: flex; flex-direction: column; gap: 6px;">
     `;
 

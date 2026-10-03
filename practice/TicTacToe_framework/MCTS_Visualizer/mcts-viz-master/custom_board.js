@@ -4,22 +4,22 @@
 
 const PRESET_BOARDS = {
     "fork_corner": {
-        name: "1. Bẫy Fork Góc (X đi 2 góc, O ở tâm)",
+        name: "1. Bẫy Fork Góc (X ở ô 1, 9, O ở tâm ô 5)",
         grid: ["h", "", "", "", "m", "", "", "", "h"],
         turn: 1 // Đến lượt Machine (O)
     },
     "block_win": {
-        name: "2. Thế Buộc Chặn (X sắp 3 ô hàng trên)",
+        name: "2. Thế Buộc Chặn (X sắp 3 ô hàng trên: ô 1, 2)",
         grid: ["h", "h", "", "", "m", "", "", "", ""],
         turn: 1 // Đến lượt Machine (O)
     },
     "double_threat": {
-        name: "3. Chặn Đôi Hiểm Hóc (Endgame 3 ô trống)",
+        name: "3. Chặn Đôi Hiểm Hóc (Endgame trống ô 7, 8, 9)",
         grid: ["h", "m", "h", "m", "m", "h", "", "", ""],
         turn: 0 // Đến lượt Human (X)
     },
     "side_trap": {
-        name: "4. Bẫy Cạnh (X ô 4, O ô 1)",
+        name: "4. Bẫy Cạnh (X ô 5, O ô 2)",
         grid: ["", "m", "", "", "h", "", "", "", ""],
         turn: 0 // Đến lượt Human (X)
     }
