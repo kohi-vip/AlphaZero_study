@@ -1,0 +1,91 @@
+﻿Mã_Ván,Nước_Thứ,Quân_Đi,Mô_Hình_Đi,Ô_Được_Chọn,Thời_Gian_Tính_ms,Sụt_Giảm_DeltaV,Lỗi_Phạm_Phải,Bàn_Cờ_Trước,Bàn_Cờ_Sau,Mô_Hình_Thua,Mô_Hình_Thắng
+AlphaGo_vs_perfectTTT_005,1,X,AlphaGo,5,1165.252,0,Tối ưu,.........,....X....,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_005,2,O,perfectTTT,1,0.116,0,Tối ưu,....X....,O...X....,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_005,3,X,AlphaGo,8,1087.511,0,Tối ưu,O...X....,O...X..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_005,4,O,perfectTTT,2,0.02,0,Tối ưu,O...X..X.,OO..X..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_005,5,X,AlphaGo,4,590.811,-1,E2,OO..X..X.,OO.XX..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_005,6,O,perfectTTT,3,0.004,0,Tối ưu,OO.XX..X.,OOOXX..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_009,1,X,AlphaGo,5,1217.518,0,Tối ưu,.........,....X....,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_009,2,O,perfectTTT,1,0.116,0,Tối ưu,....X....,O...X....,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_009,3,X,AlphaGo,8,1043.33,0,Tối ưu,O...X....,O...X..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_009,4,O,perfectTTT,2,0.019,0,Tối ưu,O...X..X.,OO..X..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_009,5,X,AlphaGo,4,520.902,-1,E2,OO..X..X.,OO.XX..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_009,6,O,perfectTTT,3,0.004,0,Tối ưu,OO.XX..X.,OOOXX..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_023,1,X,AlphaGo,5,1198.055,0,Tối ưu,.........,....X....,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_023,2,O,perfectTTT,1,0.117,0,Tối ưu,....X....,O...X....,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_023,3,X,AlphaGo,8,1079.749,0,Tối ưu,O...X....,O...X..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_023,4,O,perfectTTT,2,0.02,0,Tối ưu,O...X..X.,OO..X..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_023,5,X,AlphaGo,4,514.034,-1,E2,OO..X..X.,OO.XX..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_023,6,O,perfectTTT,3,0.004,0,Tối ưu,OO.XX..X.,OOOXX..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_035,1,X,AlphaGo,5,1189.237,0,Tối ưu,.........,....X....,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_035,2,O,perfectTTT,1,0.129,0,Tối ưu,....X....,O...X....,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_035,3,X,AlphaGo,8,1083.693,0,Tối ưu,O...X....,O...X..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_035,4,O,perfectTTT,2,0.019,0,Tối ưu,O...X..X.,OO..X..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_035,5,X,AlphaGo,4,558.574,-1,E2,OO..X..X.,OO.XX..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_035,6,O,perfectTTT,3,0.004,0,Tối ưu,OO.XX..X.,OOOXX..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_045,1,X,AlphaGo,5,1301.929,0,Tối ưu,.........,....X....,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_045,2,O,perfectTTT,1,0.119,0,Tối ưu,....X....,O...X....,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_045,3,X,AlphaGo,8,1186.98,0,Tối ưu,O...X....,O...X..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_045,4,O,perfectTTT,2,0.02,0,Tối ưu,O...X..X.,OO..X..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_045,5,X,AlphaGo,4,510.428,-1,E2,OO..X..X.,OO.XX..X.,AlphaGo,perfectTTT
+AlphaGo_vs_perfectTTT_045,6,O,perfectTTT,3,0.004,0,Tối ưu,OO.XX..X.,OOOXX..X.,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_002,1,X,perfectTTT,5,0.128,0,Tối ưu,.........,....X....,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_002,2,O,AlphaGo,8,1189.425,-1,E5,....X....,....X..O.,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_002,3,X,perfectTTT,1,0.109,0,Tối ưu,....X..O.,X...X..O.,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_002,4,O,AlphaGo,3,440.218,0,Tối ưu,X...X..O.,X.O.X..O.,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_002,5,X,perfectTTT,9,0.017,0,Tối ưu,X.O.X..O.,X.O.X..OX,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_016,1,X,perfectTTT,5,0.127,0,Tối ưu,.........,....X....,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_016,2,O,AlphaGo,8,1293.366,-1,E5,....X....,....X..O.,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_016,3,X,perfectTTT,1,0.103,0,Tối ưu,....X..O.,X...X..O.,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_016,4,O,AlphaGo,3,393.173,0,Tối ưu,X...X..O.,X.O.X..O.,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_016,5,X,perfectTTT,9,0.015,0,Tối ưu,X.O.X..O.,X.O.X..OX,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_032,1,X,perfectTTT,5,0.127,0,Tối ưu,.........,....X....,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_032,2,O,AlphaGo,8,1214.06,-1,E5,....X....,....X..O.,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_032,3,X,perfectTTT,1,0.105,0,Tối ưu,....X..O.,X...X..O.,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_032,4,O,AlphaGo,3,431.668,0,Tối ưu,X...X..O.,X.O.X..O.,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_032,5,X,perfectTTT,9,0.016,0,Tối ưu,X.O.X..O.,X.O.X..OX,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_033,1,X,perfectTTT,5,0.13,0,Tối ưu,.........,....X....,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_033,2,O,AlphaGo,8,1165.844,-1,E5,....X....,....X..O.,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_033,3,X,perfectTTT,1,0.106,0,Tối ưu,....X..O.,X...X..O.,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_033,4,O,AlphaGo,3,503.108,0,Tối ưu,X...X..O.,X.O.X..O.,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_033,5,X,perfectTTT,9,0.016,0,Tối ưu,X.O.X..O.,X.O.X..OX,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_041,1,X,perfectTTT,5,0.128,0,Tối ưu,.........,....X....,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_041,2,O,AlphaGo,8,1169.226,-1,E5,....X....,....X..O.,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_041,3,X,perfectTTT,1,0.106,0,Tối ưu,....X..O.,X...X..O.,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_041,4,O,AlphaGo,9,1348.326,0,Tối ưu,X...X..O.,X...X..OO,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_041,5,X,perfectTTT,7,0.028,0,Tối ưu,X...X..OO,X...X.XOO,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_041,6,O,AlphaGo,3,836.25,0,Tối ưu,X...X.XOO,X.O.X.XOO,AlphaGo,perfectTTT
+perfectTTT_vs_AlphaGo_041,7,X,perfectTTT,4,0.011,0,Tối ưu,X.O.X.XOO,X.OXX.XOO,AlphaGo,perfectTTT
+MiniMax_ab_vs_AlphaGo_005,1,X,MiniMax_ab,5,1962.933,0,Tối ưu,.........,....X....,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_005,2,O,AlphaGo,8,1344.051,-1,E5,....X....,....X..O.,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_005,3,X,MiniMax_ab,9,116.665,0,Tối ưu,....X..O.,....X..OX,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_005,4,O,AlphaGo,1,977.104,0,Tối ưu,....X..OX,O...X..OX,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_005,5,X,MiniMax_ab,6,9.96,0,Tối ưu,O...X..OX,O...XX.OX,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_005,6,O,AlphaGo,3,526.067,0,Tối ưu,O...XX.OX,O.O.XX.OX,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_005,7,X,MiniMax_ab,4,0.434,0,Tối ưu,O.O.XX.OX,O.OXXX.OX,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_010,1,X,MiniMax_ab,2,1769.304,0,Tối ưu,.........,.X.......,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_010,2,O,AlphaGo,8,1164.582,0,Tối ưu,.X.......,.X.....O.,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_010,3,X,MiniMax_ab,4,110.556,0,Tối ưu,.X.....O.,.X.X...O.,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_010,4,O,AlphaGo,1,952.106,0,Tối ưu,.X.X...O.,OX.X...O.,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_010,5,X,MiniMax_ab,5,10.327,0,Tối ưu,OX.X...O.,OX.XX..O.,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_010,6,O,AlphaGo,3,383.277,-1,E2,OX.XX..O.,OXOXX..O.,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_010,7,X,MiniMax_ab,6,0.084,0,Tối ưu,OXOXX..O.,OXOXXX.O.,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_014,1,X,MiniMax_ab,4,1802.039,0,Tối ưu,.........,...X.....,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_014,2,O,AlphaGo,3,1069.924,-1,E5,...X.....,..OX.....,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_014,3,X,MiniMax_ab,1,78.52,0,Tối ưu,..OX.....,X.OX.....,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_014,4,O,AlphaGo,7,561.632,0,Tối ưu,X.OX.....,X.OX..O..,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_014,5,X,MiniMax_ab,5,5.861,0,Tối ưu,X.OX..O..,X.OXX.O..,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_014,6,O,AlphaGo,2,334.759,0,Tối ưu,X.OXX.O..,XOOXX.O..,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_014,7,X,MiniMax_ab,6,0.081,0,Tối ưu,XOOXX.O..,XOOXXXO..,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_031,1,X,MiniMax_ab,5,2066.145,0,Tối ưu,.........,....X....,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_031,2,O,AlphaGo,8,1468.178,-1,E5,....X....,....X..O.,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_031,3,X,MiniMax_ab,6,123.935,0,Tối ưu,....X..O.,....XX.O.,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_031,4,O,AlphaGo,4,895.029,0,Tối ưu,....XX.O.,...OXX.O.,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_031,5,X,MiniMax_ab,9,9.995,0,Tối ưu,...OXX.O.,...OXX.OX,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_031,6,O,AlphaGo,3,343.116,0,Tối ưu,...OXX.OX,..OOXX.OX,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_031,7,X,MiniMax_ab,1,0.084,0,Tối ưu,..OOXX.OX,X.OOXX.OX,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_048,1,X,MiniMax_ab,5,1867.878,0,Tối ưu,.........,....X....,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_048,2,O,AlphaGo,8,1209.046,-1,E5,....X....,....X..O.,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_048,3,X,MiniMax_ab,4,118.055,0,Tối ưu,....X..O.,...XX..O.,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_048,4,O,AlphaGo,1,444.903,0,Tối ưu,...XX..O.,O..XX..O.,AlphaGo,MiniMax_ab
+MiniMax_ab_vs_AlphaGo_048,5,X,MiniMax_ab,6,5.101,0,Tối ưu,O..XX..O.,O..XXX.O.,AlphaGo,MiniMax_ab
